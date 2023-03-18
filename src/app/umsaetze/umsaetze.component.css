@@ -2,24 +2,41 @@
   width: 100%;
 }
 
-.mat-column-demo-position {
-  width: 32px;
+.mat-column-demo-buchungstag {
+  width: 20px;
   border-right: 1px solid currentColor;
   padding-right: 24px;
   text-align: center;
+  font-size: 15px;
 }
 
-.mat-column-demo-name {
+.mat-column-demo-gegenIban {
   padding-left: 16px;
-  font-size: 20px;
+  font-size: 15px;
 }
 
-.mat-column-demo-weight {
+.mat-column-demo-gegenkonto {
   font-style: italic;
+  font-size: 15px;
 }
 
-.mat-column-demo-symbol {
-  width: 32px;
+.mat-column-demo-verwendungszweck {
+  width: 50px;
+  font-size: 15px;
+}
+
+.mat-column-demo-umsatz {
+  font-style: italic;
   text-align: center;
   font-weight: bold;
+  width: 15px;
+  font-size: 15px;
+}
+
+.minus {
+  color: #de1212;
+}
+
+.plus {
+  color: #41d219;
 }

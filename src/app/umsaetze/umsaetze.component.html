@@ -6,13 +6,17 @@
              [dataLabels]="chartOptions.dataLabels!"
              [stroke]="chartOptions.stroke"
              [xaxis]="chartOptions.xaxis!"
+             [yaxis]="chartOptions.yaxis!"
+             [tooltip]="chartOptions.tooltip!"
+             [legend]="chartOptions.legend!"
+
   ></apx-chart>
 
   <table mat-table [dataSource]="umsaetze" class="mat-elevation-z8 demo-table">
     <!-- Buchungstag -->
     <ng-container matColumnDef="demo-buchungstag">
       <th mat-header-cell *matHeaderCellDef> Buchungstag </th>
-      <td mat-cell *matCellDef="let element"> {{element.buchungstag}} </td>
+      <td mat-cell *matCellDef="let element"> {{element.buchungstag | date:'dd.MM.yyyy'}} </td>
     </ng-container>
 
     <!-- GegenIban -->
@@ -36,7 +40,7 @@
     <!-- Umsatz  -->
     <ng-container matColumnDef="demo-umsatz">
       <th mat-header-cell *matHeaderCellDef> Umsatz </th>
-      <td mat-cell *matCellDef="let element"> {{element.umsatz}} </td>
+      <td mat-cell [ngClass]="{'minus': element.umsatz.indexOf('-') > -1, 'plus': element.umsatz.indexOf('-') <= -1}" *matCellDef="let element"> {{element.umsatz}} € </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

@@ -22,7 +22,6 @@ export class AppComponent implements OnInit{
   balanceArray = new Map<string, string>();
   xaxisCategories = new Map<string, string>();
   title = 'app';
-  destroy$: Subject<boolean> = new Subject<boolean>();
 
 
   getUmsaetze() {
@@ -38,10 +37,10 @@ export class AppComponent implements OnInit{
           let gegenkonto = responseElement[index].gegenkonto;
           let verwendungszweck = responseElement[index].verwendungszweck;
           let umsatz = responseElement[index].umsatz;
-          this.umsaetze.push(new Umsatz(buchungstag, gegenIban, gegenkonto, verwendungszweck, umsatz))
+          this.umsaetze.push(new Umsatz(new Date(buchungstag), gegenIban, gegenkonto, verwendungszweck, umsatz))
 
           // keyMap = buchungstag.substring(0,4)
-          keyMap = buchungstag.substring(5,7)+ "-" + buchungstag.substring(0,4)
+          keyMap = buchungstag.toString().substring(5,7)+ "-" + buchungstag.toString().substring(0,4)
           if (this.balanceArray.has(keyMap)){
             if (Number.parseFloat(umsatz) > 0){
               this.incomeArray.set(keyMap, (Number.parseFloat(umsatz.replaceAll(".", ""))  + Number.parseFloat(this.incomeArray.get(keyMap)!.toString())).toFixed(2));
@@ -67,28 +66,31 @@ export class AppComponent implements OnInit{
             {
               name: "Income",
               type: "column",
-              data: Array.from(this.incomeArray.values())
+              data: Array.from(this.incomeArray.values()),
+              color: '#0ce138'
             },
             {
               name: "Outcome",
               type: "column",
-              data: Array.from(this.outcomeArray.values())
+              data: Array.from(this.outcomeArray.values()),
+              color: '#e0145b'
             },
             {
               name: "Balance",
               type: "area",
-              data: Array.from(this.balanceArray.values())
+              data: Array.from(this.balanceArray.values()),
+              color: '#1449e0'
             }
           ],
           chart: {
-            height: 350,
+            height: 550,
             type: "line",
             stacked: false
           },
           dataLabels: {
             enabled: true,
             formatter: function (val:any) {
-              return val + "€"
+              return val + " €"
             },
             offsetY: -6,
             style: {
@@ -108,46 +110,14 @@ export class AppComponent implements OnInit{
           },
           yaxis: [
             {
-              axisTicks: {
-                show: true
-              },
-              axisBorder: {
-                show: true,
-                color: "#13d734"
-              },
-              dataLabels: {
-                enabled: true,
-                formatter: function (val:any) {
-                  return val + "€"
-                }
-              },
-              labels: {
-                style: {
-                  colors: "#13d734"
-                },
-                formatter: function (val:any) {
-                  return val + "€"
-                }
-              },
-              title: {
-                text: "Income",
-                style: {
-                  color: "#13d734"
-                }
-              },
-              tooltip: {
-                enabled: true
-              }
-            },
-            {
               seriesName: "Income",
-              opposite: true,
+              opposite: false,
               axisTicks: {
                 show: true
               },
               axisBorder: {
                 show: true,
-                color: "#e80e6a"
+                color: '#2E93fA'
               },
               dataLabels: {
                 enabled: true,
@@ -157,47 +127,16 @@ export class AppComponent implements OnInit{
               },
               labels: {
                 style: {
-                  colors: "#e80e6a"
+                  colors: '#2E93fA'
                 },
                 formatter: function (val:any) {
-                  return val + "€"
+                  return val + " €"
                 }
               },
               title: {
-                text: "Operating Cashflow",
+                text: "in Euro",
                 style: {
-                  color: "#e80e6a"
-                }
-              }
-            },
-            {
-              seriesName: "Revenue",
-              opposite: true,
-              axisTicks: {
-                show: true
-              },
-              axisBorder: {
-                show: true,
-                color: "#e0145b"
-              },
-              dataLabels: {
-                enabled: true,
-                formatter: function (val:any) {
-                  return val + "€"
-                }
-              },
-              labels: {
-                style: {
-                  colors: "#e0145b"
-                },
-                formatter: function (val:any) {
-                  return val + "€"
-                }
-              },
-              title: {
-                text: "Revenue (thousand crores)",
-                style: {
-                  color: "#e0145b"
+                  color: '#2E93fA'
                 }
               }
             }
