@@ -1,5 +1,12 @@
 <div class="container">
-  <h2>Umsätze</h2>
+
+  <apx-chart [series]="chartOptions.series!"
+             [chart]="chartOptions.chart!"
+             [title]="chartOptions.title!"
+             [dataLabels]="chartOptions.dataLabels!"
+             [stroke]="chartOptions.stroke"
+             [xaxis]="chartOptions.xaxis!"
+  ></apx-chart>
 
   <table mat-table [dataSource]="umsaetze" class="mat-elevation-z8 demo-table">
     <!-- Buchungstag -->
