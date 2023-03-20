@@ -1,15 +1,32 @@
 <div class="container">
 
-  <apx-chart [series]="chartOptions.series!"
-             [chart]="chartOptions.chart!"
-             [title]="chartOptions.title!"
-             [dataLabels]="chartOptions.dataLabels!"
-             [stroke]="chartOptions.stroke"
-             [xaxis]="chartOptions.xaxis!"
-             [yaxis]="chartOptions.yaxis!"
-             [tooltip]="chartOptions.tooltip!"
-             [legend]="chartOptions.legend!"
+  <mat-radio-group aria-label="Select an option">
+    <mat-radio-button (change)="isIncomeOutcomeBalanceDiagrammOn=true;isOutcomeDiagrammOn=false" checked="true" value="1"
+        >Income/Outcome/Balance</mat-radio-button>
+    <mat-radio-button (change)="isIncomeOutcomeBalanceDiagrammOn=false;isOutcomeDiagrammOn=true" checked="false" value="2"
+        >Outcome Rate</mat-radio-button>
+  </mat-radio-group>
+  <apx-chart *ngIf="isIncomeOutcomeBalanceDiagrammOn"
+    [series]="chartOptions.series!"
+   [chart]="chartOptions.chart!"
+   [title]="chartOptions.title!"
+   [dataLabels]="chartOptions.dataLabels!"
+   [stroke]="chartOptions.stroke"
+   [xaxis]="chartOptions.xaxis!"
+   [yaxis]="chartOptions.yaxis!"
+   [tooltip]="chartOptions.tooltip!"
+   [legend]="chartOptions.legend!"
 
+  ></apx-chart>
+  <apx-chart *ngIf="isOutcomeDiagrammOn"
+    [series]="chartOptionsPie.series"
+    [chart]="chartOptionsPie.chart"
+    [dataLabels]="chartOptionsPie.dataLabels"
+    [plotOptions]="chartOptionsPie.plotOptions"
+    [responsive]="chartOptionsPie.responsive"
+    [xaxis]="chartOptionsPie.xaxis"
+    [legend]="chartOptionsPie.legend"
+    [fill]="chartOptionsPie.fill"
   ></apx-chart>
 
   <table mat-table [dataSource]="umsaetze" class="mat-elevation-z8 demo-table">
@@ -35,6 +52,12 @@
     <ng-container matColumnDef="demo-verwendungszweck">
       <th mat-header-cell *matHeaderCellDef> Verwendungszweck </th>
       <td mat-cell *matCellDef="let element"> {{element.verwendungszweck}} </td>
+    </ng-container>
+
+    <!-- Verwendungszweck -->
+    <ng-container matColumnDef="demo-kategory">
+      <th mat-header-cell *matHeaderCellDef> Kategory </th>
+      <td mat-cell *matCellDef="let element"> {{element.kategory}} </td>
     </ng-container>
 
     <!-- Umsatz  -->

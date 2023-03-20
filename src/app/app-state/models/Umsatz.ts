@@ -1,9 +1,10 @@
 export class Umsatz  {
-    constructor(buchungstag: Date, gegenIban: string, gegenkonto: string, verwendungszweck: string, umsatz: string) {
+    constructor(buchungstag: Date, gegenIban: string, gegenkonto: string, verwendungszweck: string, kategory: string, umsatz: string) {
         this.buchungstag = new Date(buchungstag);
         this.gegenIban = gegenIban;
         this.gegenkonto = gegenkonto;
         this.verwendungszweck = verwendungszweck;
+        this.kategory = kategory;
         this.umsatz = umsatz;
     }
 
@@ -11,5 +12,6 @@ export class Umsatz  {
     gegenIban: string;
     gegenkonto: string;
     verwendungszweck: string;
+    kategory: string;
     umsatz: string;
 }

@@ -25,6 +25,14 @@
   font-size: 15px;
 }
 
+.mat-column-demo-kategory {
+  font-style: italic;
+  text-align: center;
+  font-weight: bold;
+  width: 15px;
+  font-size: 15px;
+}
+
 .mat-column-demo-umsatz {
   font-style: italic;
   text-align: center;

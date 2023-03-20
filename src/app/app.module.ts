@@ -8,6 +8,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTableModule } from '@angular/material/table';
 import { NgApexchartsModule } from "ng-apexcharts";
+import {MatRadioModule} from '@angular/material/radio';
+
 
 
 
@@ -22,7 +24,8 @@ import { NgApexchartsModule } from "ng-apexcharts";
     BrowserAnimationsModule,
     MatSlideToggleModule,
     MatTableModule,
-    NgApexchartsModule
+    NgApexchartsModule,
+    MatRadioModule
   ],
   providers: [],
   bootstrap: [AppComponent]
