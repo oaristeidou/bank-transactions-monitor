@@ -1,10 +1,19 @@
 <div class="container">
 
+  <select matNativeControl [(ngModel)]="selectedtimeSector" (ngModelChange)="onValChange($event)">
+    <option value="monthly">Monthly</option>
+    <option value="quarterly">Quarterly</option>
+    <option value="half-yearly">Half-Yearly</option>
+    <option value="yearly">Yearly</option>
+  </select>
+
   <mat-radio-group aria-label="Select an option">
-    <mat-radio-button (change)="isIncomeOutcomeBalanceDiagrammOn=true;isOutcomeDiagrammOn=false" checked="true" value="1"
+    <mat-radio-button (change)="isIncomeOutcomeBalanceDiagrammOn=true;isOutcomeDiagrammOn=false;isIncomeDiagrammOn=false" checked="true" value="1"
         >Income/Outcome/Balance</mat-radio-button>
-    <mat-radio-button (change)="isIncomeOutcomeBalanceDiagrammOn=false;isOutcomeDiagrammOn=true" checked="false" value="2"
+    <mat-radio-button (change)="isIncomeOutcomeBalanceDiagrammOn=false;isOutcomeDiagrammOn=true;isIncomeDiagrammOn=false" checked="false" value="2"
         >Outcome Rate</mat-radio-button>
+    <mat-radio-button (change)="isIncomeOutcomeBalanceDiagrammOn=false;isOutcomeDiagrammOn=false;isIncomeDiagrammOn=true" checked="false" value="2"
+        >Income Rate</mat-radio-button>
   </mat-radio-group>
   <apx-chart *ngIf="isIncomeOutcomeBalanceDiagrammOn"
     [series]="chartOptions.series!"
@@ -27,6 +36,16 @@
     [xaxis]="chartOptionsPie.xaxis"
     [legend]="chartOptionsPie.legend"
     [fill]="chartOptionsPie.fill"
+  ></apx-chart>
+  <apx-chart *ngIf="isIncomeDiagrammOn"
+    [series]="chartOptionsIncomePie.series"
+    [chart]="chartOptionsIncomePie.chart"
+    [dataLabels]="chartOptionsIncomePie.dataLabels"
+    [plotOptions]="chartOptionsIncomePie.plotOptions"
+    [responsive]="chartOptionsIncomePie.responsive"
+    [xaxis]="chartOptionsIncomePie.xaxis"
+    [legend]="chartOptionsIncomePie.legend"
+    [fill]="chartOptionsIncomePie.fill"
   ></apx-chart>
 
   <table mat-table [dataSource]="umsaetze" class="mat-elevation-z8 demo-table">

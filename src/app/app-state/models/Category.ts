@@ -7,7 +7,7 @@ export class Category {
   constructor(categoryName: string, valuesBySector: string[]) {
     this.name = categoryName;
     this.data = valuesBySector;
-    this.color = "#6" + Math.floor(Math.random()*16777215).toString(16).substring(0,5);
+    this.color = "#8" + Math.floor(Math.random()*16777215).toString(16).substring(0,5);
   }
 
 

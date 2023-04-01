@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule  } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
@@ -9,6 +9,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTableModule } from '@angular/material/table';
 import { NgApexchartsModule } from "ng-apexcharts";
 import {MatRadioModule} from '@angular/material/radio';
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {FormsModule} from "@angular/forms";
 
 
 
@@ -25,7 +27,9 @@ import {MatRadioModule} from '@angular/material/radio';
     MatSlideToggleModule,
     MatTableModule,
     NgApexchartsModule,
-    MatRadioModule
+    MatRadioModule,
+    MatFormFieldModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
