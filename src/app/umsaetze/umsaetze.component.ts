@@ -1,10 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {Umsatz} from "../app-state/models/Umsatz";
 import {ChartOptions} from "../app-state/models/ChartOptions";
 import {AppService} from "../app.service";
 import moment = require('moment');
 import {Category} from "../app-state/models/Category";
-import {MatSelectModule} from '@angular/material/select';
+import {MatPaginator} from "@angular/material/paginator";
+import {MatTableDataSource} from "@angular/material/table";
 
 
 
@@ -13,7 +14,7 @@ import {MatSelectModule} from '@angular/material/select';
   templateUrl: './umsaetze.component.html',
   styleUrls: ['./umsaetze.component.css']
 })
-export class UmsaetzeComponent implements OnInit{
+export class UmsaetzeComponent implements OnInit, AfterViewInit{
 
   constructor(private appService: AppService) {
   }
@@ -26,7 +27,7 @@ export class UmsaetzeComponent implements OnInit{
   isOutcomeDiagrammOn: boolean = false;
   isIncomeDiagrammOn: boolean = false;
 
-  umsaetze: Umsatz[] | any = [];
+  umsaetze: Umsatz[] | any ;
   displayedColumns: string[] = ['demo-buchungstag', 'demo-gegenIban', 'demo-gegenkonto', 'demo-verwendungszweck', 'demo-kategory', 'demo-umsatz'];
   incomeArray = new Map<string, string>();
   outcomeArray = new Map<string, string>();
@@ -37,6 +38,7 @@ export class UmsaetzeComponent implements OnInit{
   incomeCategoryList = new Set<string>;
   selectedtimeSector = "monthly";
 
+  @ViewChild(MatPaginator) paginator: MatPaginator | any;
 
   getUmsaetze() {
     this.appService.getUmsaetze()
@@ -49,6 +51,7 @@ export class UmsaetzeComponent implements OnInit{
         this.incomeDataCategoryArray = [];
         this.outcomeCategoryList = new Set<string>;
         this.incomeCategoryList = new Set<string>;
+        let indexID = 0;
 
         for(let key in response){
 
@@ -62,7 +65,7 @@ export class UmsaetzeComponent implements OnInit{
           let verwendungszweck = responseElement[index].verwendungszweck;
           let kategory = responseElement[index].kategory;
           let umsatz = responseElement[index].umsatz;
-          this.umsaetze.push(new Umsatz(new Date(buchungstag), gegenIban, gegenkonto, verwendungszweck, kategory, umsatz))
+          this.umsaetze.push(new Umsatz(new Date(buchungstag), gegenIban, gegenkonto, verwendungszweck, kategory, umsatz, indexID++))
 
           // timeSector = buchungstag.substring(0,4)
           timeSector = "";
@@ -133,6 +136,9 @@ export class UmsaetzeComponent implements OnInit{
 
         this.setCharOptionsForPie();
         this.setCharOptionsForIncomePie();
+
+        this.umsaetze = new MatTableDataSource<Umsatz>(this.umsaetze);
+        this.umsaetze.paginator = this.paginator;
 
         console.log(this.umsaetze);
         console.log("incomeArray: " + Array.from(this.incomeArray.values()));
@@ -249,7 +255,7 @@ export class UmsaetzeComponent implements OnInit{
       series: this.outcomeDataCategoryArray,
       chart: {
         type: "bar",
-        height: 950,
+        height: 1170,
         stacked: true,
         stackType: "100%"
       },
@@ -283,7 +289,7 @@ export class UmsaetzeComponent implements OnInit{
       series: this.incomeDataCategoryArray,
       chart: {
         type: "bar",
-        height: 950,
+        height: 1170,
         stacked: true,
         stackType: "100%"
       },
@@ -335,7 +341,7 @@ export class UmsaetzeComponent implements OnInit{
         }
       ],
       chart: {
-        height: 950,
+        height: 1170,
         type: "line",
         stacked: false
       },
@@ -416,6 +422,10 @@ export class UmsaetzeComponent implements OnInit{
 
   onValChange(value: any){
     this.getUmsaetze();
+  }
+
+  ngAfterViewInit() {
+    this.umsaetze.paginator = this.paginator;
   }
 
 }

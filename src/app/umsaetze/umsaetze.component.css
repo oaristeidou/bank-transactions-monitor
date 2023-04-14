@@ -1,5 +1,6 @@
 .demo-table {
   width: 100%;
+  white-space: nowrap;
 }
 
 .mat-column-demo-buchungstag {
@@ -13,32 +14,44 @@
 .mat-column-demo-gegenIban {
   padding-left: 16px;
   font-size: 15px;
+  width: 100px;
+  word-wrap: break-word;
+  max-width: 270px;
 }
 
 .mat-column-demo-gegenkonto {
   font-style: italic;
   font-size: 15px;
+  width: 50px;
+  word-wrap: break-word;
+  max-width: 170px;
 }
 
 .mat-column-demo-verwendungszweck {
   width: 50px;
   font-size: 15px;
+  word-wrap: break-word;
+  max-width: 850px;
 }
 
 .mat-column-demo-kategory {
   font-style: italic;
   text-align: center;
   font-weight: bold;
-  width: 15px;
   font-size: 15px;
+  width: 100px;
+  word-wrap: break-word;
+  max-width: 130px;
 }
 
 .mat-column-demo-umsatz {
   font-style: italic;
   text-align: center;
   font-weight: bold;
-  width: 15px;
   font-size: 15px;
+  width: 100px;
+  word-wrap: break-word;
+  max-width: 170px;
 }
 
 .minus {

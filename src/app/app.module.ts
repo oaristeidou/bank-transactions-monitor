@@ -11,6 +11,7 @@ import { NgApexchartsModule } from "ng-apexcharts";
 import {MatRadioModule} from '@angular/material/radio';
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {FormsModule} from "@angular/forms";
+import {MatPaginatorModule} from "@angular/material/paginator";
 
 
 
@@ -29,7 +30,8 @@ import {FormsModule} from "@angular/forms";
     NgApexchartsModule,
     MatRadioModule,
     MatFormFieldModule,
-    FormsModule
+    FormsModule,
+    MatPaginatorModule
   ],
   providers: [],
   bootstrap: [AppComponent]
