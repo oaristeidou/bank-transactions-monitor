@@ -10,8 +10,11 @@ import { MatTableModule } from '@angular/material/table';
 import { NgApexchartsModule } from "ng-apexcharts";
 import {MatRadioModule} from '@angular/material/radio';
 import {MatFormFieldModule} from "@angular/material/form-field";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatPaginatorModule} from "@angular/material/paginator";
+import {MatNativeDateModule} from "@angular/material/core";
+import {MatDatepickerModule} from "@angular/material/datepicker";
+import {MatIconModule} from "@angular/material/icon";
 
 
 
@@ -31,7 +34,11 @@ import {MatPaginatorModule} from "@angular/material/paginator";
     MatRadioModule,
     MatFormFieldModule,
     FormsModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatNativeDateModule,
+    MatDatepickerModule,
+    MatIconModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

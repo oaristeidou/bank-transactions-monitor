@@ -6,13 +6,25 @@ import moment = require('moment');
 import {Category} from "../app-state/models/Category";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatTableDataSource} from "@angular/material/table";
+import {MAT_MOMENT_DATE_FORMATS, MomentDateAdapter} from '@angular/material-moment-adapter';
+import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
+import {FormControl, FormGroup} from "@angular/forms";
+import {DateRange, ExtractDateTypeFromSelection, MatDatepickerInputEvent} from "@angular/material/datepicker";
+import {D} from "@angular/cdk/keycodes";
 
 
 
 @Component({
   selector: 'app-umsaetze',
   templateUrl: './umsaetze.component.html',
-  styleUrls: ['./umsaetze.component.css']
+  styleUrls: ['./umsaetze.component.css'],
+  providers: [
+    // `MomentDateAdapter` and `MAT_MOMENT_DATE_FORMATS` can be automatically provided by importing
+    // `MatMomentDateModule` in your applications root module. We provide it at the component level
+    // here, due to limitations of our example generation script.
+    {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE]},
+    {provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS},
+  ],
 })
 export class UmsaetzeComponent implements OnInit, AfterViewInit{
 
@@ -37,6 +49,10 @@ export class UmsaetzeComponent implements OnInit, AfterViewInit{
   outcomeCategoryList = new Set<string>;
   incomeCategoryList = new Set<string>;
   selectedtimeSector = "monthly";
+  range = new FormGroup({
+    start: new FormControl<Date | null>(null),
+    end: new FormControl<Date | null>(null),
+  });
 
   @ViewChild(MatPaginator) paginator: MatPaginator | any;
 
@@ -65,65 +81,68 @@ export class UmsaetzeComponent implements OnInit, AfterViewInit{
           let verwendungszweck = responseElement[index].verwendungszweck;
           let kategory = responseElement[index].kategory;
           let umsatz = responseElement[index].umsatz;
-          this.umsaetze.push(new Umsatz(new Date(buchungstag), gegenIban, gegenkonto, verwendungszweck, kategory, umsatz, indexID++))
 
-          // timeSector = buchungstag.substring(0,4)
+
           timeSector = "";
-          if (this.selectedtimeSector == "monthly") {
-            timeSector = buchungstag.toString().substring(5, 7) + "-" + buchungstag.toString().substring(0, 4)
-            keyMapPie = buchungstag.toString().substring(5, 7) + "-" + buchungstag.toString().substring(0, 4) + "-" + kategory;
-          } else if (this.selectedtimeSector == "quarterly"){
-            let month = buchungstag.toString().substring(5, 7);
-            let temp = "";
-            if (month == "01" || month == "02" || month == "03" ){
-              temp = "Q1 ";
-            } else if (month == "04" || month == "05" || month == "06" ){
-              temp = "Q2 ";
-            } else if (month == "07" || month == "08" || month == "09" ){
-              temp = "Q3 ";
-            } else if (month == "10" || month == "11" || month == "12" ){
-              temp = "Q4 ";
-            }
-            timeSector = temp + buchungstag.toString().substring(0, 4)
-            keyMapPie = temp + buchungstag.toString().substring(0, 4) + "-" + kategory;
-          } else if (this.selectedtimeSector == "half-yearly"){
-            let month = buchungstag.toString().substring(5, 7);
-            let temp = "";
-            if (month == "01" || month == "02" || month == "03" || month == "04" || month == "05" || month == "06"){
-              temp = "01-06 ";
-            } else if (month == "07" || month == "08" || month == "09" || month == "10" || month == "11" || month == "12"){
-              temp = "07-12 ";
-            }
-            timeSector = temp + buchungstag.toString().substring(0, 4)
-            keyMapPie = temp + buchungstag.toString().substring(0, 4) + "-" + kategory;
-          } else if (this.selectedtimeSector == "yearly"){
-            timeSector = buchungstag.toString().substring(0, 4)
-            keyMapPie = buchungstag.toString().substring(0, 4) + "-" + kategory;
-          } else {
-            timeSector = buchungstag.toString().substring(5, 7) + "-" + buchungstag.toString().substring(0, 4)
-            keyMapPie = buchungstag.toString().substring(5, 7) + "-" + buchungstag.toString().substring(0, 4) + "-" + kategory;
-          }
-
-          if (this.balanceArray.has(timeSector)) {
-            if (Number.parseFloat(umsatz) > 0) {
-              this.incomeArray.set(timeSector, (Number.parseFloat(umsatz.replaceAll(".", "")) + Number.parseFloat(this.incomeArray.get(timeSector)!.toString())).toFixed(2));
-              this.incomeCategoryList.add(kategory);
+          var valueDate = new Date(buchungstag);
+          if (this.range.value.start == null || this.range.value.end == null || this.range.value.start <= valueDate && this.range.value.end >= valueDate){
+            this.umsaetze.push(new Umsatz(new Date(buchungstag), gegenIban, gegenkonto, verwendungszweck, kategory, umsatz, indexID++))
+            if (this.selectedtimeSector == "monthly") {
+              timeSector = buchungstag.toString().substring(5, 7) + "-" + buchungstag.toString().substring(0, 4)
+              keyMapPie = buchungstag.toString().substring(5, 7) + "-" + buchungstag.toString().substring(0, 4) + "-" + kategory;
+            } else if (this.selectedtimeSector == "quarterly"){
+              let month = buchungstag.toString().substring(5, 7);
+              let temp = "";
+              if (month == "01" || month == "02" || month == "03" ){
+                temp = "Q1 ";
+              } else if (month == "04" || month == "05" || month == "06" ){
+                temp = "Q2 ";
+              } else if (month == "07" || month == "08" || month == "09" ){
+                temp = "Q3 ";
+              } else if (month == "10" || month == "11" || month == "12" ){
+                temp = "Q4 ";
+              }
+              timeSector = temp + buchungstag.toString().substring(0, 4)
+              keyMapPie = temp + buchungstag.toString().substring(0, 4) + "-" + kategory;
+            } else if (this.selectedtimeSector == "half-yearly"){
+              let month = buchungstag.toString().substring(5, 7);
+              let temp = "";
+              if (month == "01" || month == "02" || month == "03" || month == "04" || month == "05" || month == "06"){
+                temp = "01-06 ";
+              } else if (month == "07" || month == "08" || month == "09" || month == "10" || month == "11" || month == "12"){
+                temp = "07-12 ";
+              }
+              timeSector = temp + buchungstag.toString().substring(0, 4)
+              keyMapPie = temp + buchungstag.toString().substring(0, 4) + "-" + kategory;
+            } else if (this.selectedtimeSector == "yearly"){
+              timeSector = buchungstag.toString().substring(0, 4)
+              keyMapPie = buchungstag.toString().substring(0, 4) + "-" + kategory;
             } else {
-              this.outcomeArray.set(timeSector, (Number.parseFloat(umsatz.replaceAll(".", "")) + Number.parseFloat(this.outcomeArray.get(timeSector)!.toString())).toFixed(2));
-              this.outcomeCategoryList.add(kategory);
+              timeSector = buchungstag.toString().substring(5, 7) + "-" + buchungstag.toString().substring(0, 4)
+              keyMapPie = buchungstag.toString().substring(5, 7) + "-" + buchungstag.toString().substring(0, 4) + "-" + kategory;
             }
-            this.balanceArray.set(timeSector, (Number.parseFloat(umsatz.replaceAll(".", "")) + Number.parseFloat(this.balanceArray.get(timeSector)!.toString())).toFixed(2));
 
-          } else {
-            this.incomeArray.set(timeSector, "0");
-            this.outcomeArray.set(timeSector, "0");
-            this.balanceArray.set(timeSector, "0");
-            if (Number.parseFloat(umsatz) > 0) {
-              this.incomeArray.set(timeSector, Number.parseFloat(umsatz.replaceAll(".", "")).toFixed(2));
+            if (this.balanceArray.has(timeSector)) {
+              if (Number.parseFloat(umsatz) > 0) {
+                this.incomeArray.set(timeSector, (Number.parseFloat(umsatz.replaceAll(".", "")) + Number.parseFloat(this.incomeArray.get(timeSector)!.toString())).toFixed(2));
+                this.incomeCategoryList.add(kategory);
+              } else {
+                this.outcomeArray.set(timeSector, (Number.parseFloat(umsatz.replaceAll(".", "")) + Number.parseFloat(this.outcomeArray.get(timeSector)!.toString())).toFixed(2));
+                this.outcomeCategoryList.add(kategory);
+              }
+              this.balanceArray.set(timeSector, (Number.parseFloat(umsatz.replaceAll(".", "")) + Number.parseFloat(this.balanceArray.get(timeSector)!.toString())).toFixed(2));
+
             } else {
-              this.outcomeArray.set(timeSector, Number.parseFloat(umsatz.replaceAll(".", "")).toFixed(2));
+              this.incomeArray.set(timeSector, "0");
+              this.outcomeArray.set(timeSector, "0");
+              this.balanceArray.set(timeSector, "0");
+              if (Number.parseFloat(umsatz) > 0) {
+                this.incomeArray.set(timeSector, Number.parseFloat(umsatz.replaceAll(".", "")).toFixed(2));
+              } else {
+                this.outcomeArray.set(timeSector, Number.parseFloat(umsatz.replaceAll(".", "")).toFixed(2));
+              }
+              this.balanceArray.set(timeSector, Number.parseFloat(umsatz.replaceAll(".", "")).toFixed(2));
             }
-            this.balanceArray.set(timeSector, Number.parseFloat(umsatz.replaceAll(".", "")).toFixed(2));
           }
 
 
@@ -422,6 +441,12 @@ export class UmsaetzeComponent implements OnInit, AfterViewInit{
 
   onValChange(value: any){
     this.getUmsaetze();
+  }
+
+  onDateChange(){
+    if (this.range.value.start != null && this.range.value.end !=null){
+      this.getUmsaetze();
+    }
   }
 
   ngAfterViewInit() {
