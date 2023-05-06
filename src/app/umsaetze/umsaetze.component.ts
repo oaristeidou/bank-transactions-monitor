@@ -49,7 +49,7 @@ export class UmsaetzeComponent implements OnInit, AfterViewInit{
   outcomeCategoryList = new Set<string>;
   incomeCategoryList = new Set<string>;
   selectedtimeSector = "monthly";
-  range = new FormGroup({
+  dateRange = new FormGroup({
     start: new FormControl<Date | null>(null),
     end: new FormControl<Date | null>(null),
   });
@@ -67,86 +67,11 @@ export class UmsaetzeComponent implements OnInit, AfterViewInit{
         this.incomeDataCategoryArray = [];
         this.outcomeCategoryList = new Set<string>;
         this.incomeCategoryList = new Set<string>;
-        let indexID = 0;
 
-        for(let key in response){
+        this.createUmsaetzeList(response);
 
-          let timeSector = "";
-          let keyMapPie = "";
-          let responseElement = response as Umsatz[];
-          let index = Number.parseInt(key as string);
-          let buchungstag = responseElement[index].buchungstag;
-          let gegenIban = responseElement[index].gegenIban;
-          let gegenkonto = responseElement[index].gegenkonto;
-          let verwendungszweck = responseElement[index].verwendungszweck;
-          let kategory = responseElement[index].kategory;
-          let umsatz = responseElement[index].umsatz;
+        this.setDataBalanceOutcomeIncomeCategories();
 
-
-          timeSector = "";
-          var valueDate = new Date(buchungstag);
-          if (this.range.value.start == null || this.range.value.end == null || this.range.value.start <= valueDate && this.range.value.end >= valueDate){
-            this.umsaetze.push(new Umsatz(new Date(buchungstag), gegenIban, gegenkonto, verwendungszweck, kategory, umsatz, indexID++))
-            if (this.selectedtimeSector == "monthly") {
-              timeSector = buchungstag.toString().substring(5, 7) + "-" + buchungstag.toString().substring(0, 4)
-              keyMapPie = buchungstag.toString().substring(5, 7) + "-" + buchungstag.toString().substring(0, 4) + "-" + kategory;
-            } else if (this.selectedtimeSector == "quarterly"){
-              let month = buchungstag.toString().substring(5, 7);
-              let temp = "";
-              if (month == "01" || month == "02" || month == "03" ){
-                temp = "Q1 ";
-              } else if (month == "04" || month == "05" || month == "06" ){
-                temp = "Q2 ";
-              } else if (month == "07" || month == "08" || month == "09" ){
-                temp = "Q3 ";
-              } else if (month == "10" || month == "11" || month == "12" ){
-                temp = "Q4 ";
-              }
-              timeSector = temp + buchungstag.toString().substring(0, 4)
-              keyMapPie = temp + buchungstag.toString().substring(0, 4) + "-" + kategory;
-            } else if (this.selectedtimeSector == "half-yearly"){
-              let month = buchungstag.toString().substring(5, 7);
-              let temp = "";
-              if (month == "01" || month == "02" || month == "03" || month == "04" || month == "05" || month == "06"){
-                temp = "01-06 ";
-              } else if (month == "07" || month == "08" || month == "09" || month == "10" || month == "11" || month == "12"){
-                temp = "07-12 ";
-              }
-              timeSector = temp + buchungstag.toString().substring(0, 4)
-              keyMapPie = temp + buchungstag.toString().substring(0, 4) + "-" + kategory;
-            } else if (this.selectedtimeSector == "yearly"){
-              timeSector = buchungstag.toString().substring(0, 4)
-              keyMapPie = buchungstag.toString().substring(0, 4) + "-" + kategory;
-            } else {
-              timeSector = buchungstag.toString().substring(5, 7) + "-" + buchungstag.toString().substring(0, 4)
-              keyMapPie = buchungstag.toString().substring(5, 7) + "-" + buchungstag.toString().substring(0, 4) + "-" + kategory;
-            }
-
-            if (this.balanceArray.has(timeSector)) {
-              if (Number.parseFloat(umsatz) > 0) {
-                this.incomeArray.set(timeSector, (Number.parseFloat(umsatz.replaceAll(".", "")) + Number.parseFloat(this.incomeArray.get(timeSector)!.toString())).toFixed(2));
-                this.incomeCategoryList.add(kategory);
-              } else {
-                this.outcomeArray.set(timeSector, (Number.parseFloat(umsatz.replaceAll(".", "")) + Number.parseFloat(this.outcomeArray.get(timeSector)!.toString())).toFixed(2));
-                this.outcomeCategoryList.add(kategory);
-              }
-              this.balanceArray.set(timeSector, (Number.parseFloat(umsatz.replaceAll(".", "")) + Number.parseFloat(this.balanceArray.get(timeSector)!.toString())).toFixed(2));
-
-            } else {
-              this.incomeArray.set(timeSector, "0");
-              this.outcomeArray.set(timeSector, "0");
-              this.balanceArray.set(timeSector, "0");
-              if (Number.parseFloat(umsatz) > 0) {
-                this.incomeArray.set(timeSector, Number.parseFloat(umsatz.replaceAll(".", "")).toFixed(2));
-              } else {
-                this.outcomeArray.set(timeSector, Number.parseFloat(umsatz.replaceAll(".", "")).toFixed(2));
-              }
-              this.balanceArray.set(timeSector, Number.parseFloat(umsatz.replaceAll(".", "")).toFixed(2));
-            }
-          }
-
-
-        }
         this.setCharOptionsForMultibar();
 
         this.sortUmseatzeArray();
@@ -158,16 +83,88 @@ export class UmsaetzeComponent implements OnInit, AfterViewInit{
 
         this.umsaetze = new MatTableDataSource<Umsatz>(this.umsaetze);
         this.umsaetze.paginator = this.paginator;
-
-        console.log(this.umsaetze);
-        console.log("incomeArray: " + Array.from(this.incomeArray.values()));
-        console.log("incomeCategoryList:" + Array.from(this.incomeCategoryList.values()));
-        console.log("incomeDataCategoryArray:" + Array.from(this.incomeDataCategoryArray.values()));
-        console.log("outcomeArray: " + Array.from(this.outcomeArray.values()));
-        console.log("balanceArray" + Array.from(this.balanceArray.values()));
-        console.log("outcomeCategoryList" + Array.from(this.outcomeCategoryList));
-        console.log("outcomeDataCategoryArray" + Array.from(this.outcomeDataCategoryArray));
       });
+  }
+
+  private createUmsaetzeList(response: Object) {
+    let indexID = 0;
+    let responseElement = response as Umsatz[];
+    for (let key in response) {
+      let responseIndex = Number.parseInt(key as string);
+      let buchungstag = responseElement[responseIndex].buchungstag;
+      let gegenIban = responseElement[responseIndex].gegenIban;
+      let gegenkonto = responseElement[responseIndex].gegenkonto;
+      let verwendungszweck = responseElement[responseIndex].verwendungszweck;
+      let kategory = responseElement[responseIndex].kategory;
+      let umsatz = responseElement[responseIndex].umsatz;
+
+      var valueDate = new Date(buchungstag);
+      if (this.dateRange.value.start == null || this.dateRange.value.end == null || this.dateRange.value.start <= valueDate && this.dateRange.value.end >= valueDate) {
+        this.umsaetze.push(new Umsatz(new Date(buchungstag), gegenIban, gegenkonto, verwendungszweck, kategory, umsatz, indexID++))
+      }
+    }
+  }
+
+  private setDataBalanceOutcomeIncomeCategories() {
+    this.umsaetze.forEach((umsatzElement: Umsatz) => {
+      let timeSector = this.setDataIntoTimeCategories(umsatzElement);
+
+      if (this.balanceArray.has(timeSector)) {
+        if (Number.parseFloat(umsatzElement.umsatz) > 0) {
+          this.incomeArray.set(timeSector, (Number.parseFloat(umsatzElement.umsatz.replaceAll(".", "")) + Number.parseFloat(this.incomeArray.get(timeSector)!.toString())).toFixed(2));
+          this.incomeCategoryList.add(umsatzElement.kategory);
+        } else {
+          this.outcomeArray.set(timeSector, (Number.parseFloat(umsatzElement.umsatz.replaceAll(".", "")) + Number.parseFloat(this.outcomeArray.get(timeSector)!.toString())).toFixed(2));
+          this.outcomeCategoryList.add(umsatzElement.kategory);
+        }
+        this.balanceArray.set(timeSector, (Number.parseFloat(umsatzElement.umsatz.replaceAll(".", "")) + Number.parseFloat(this.balanceArray.get(timeSector)!.toString())).toFixed(2));
+
+      } else {
+        this.incomeArray.set(timeSector, "0");
+        this.outcomeArray.set(timeSector, "0");
+        this.balanceArray.set(timeSector, "0");
+        if (Number.parseFloat(umsatzElement.umsatz) > 0) {
+          this.incomeArray.set(timeSector, Number.parseFloat(umsatzElement.umsatz.replaceAll(".", "")).toFixed(2));
+        } else {
+          this.outcomeArray.set(timeSector, Number.parseFloat(umsatzElement.umsatz.replaceAll(".", "")).toFixed(2));
+        }
+        this.balanceArray.set(timeSector, Number.parseFloat(umsatzElement.umsatz.replaceAll(".", "")).toFixed(2));
+      }
+    })
+  }
+
+  private setDataIntoTimeCategories(umsatzElement: Umsatz) {
+    let timeSector = "";
+    const buchungstag = (moment(umsatzElement.buchungstag)).format("yyyy-MM-DD");
+    if (this.selectedtimeSector == "monthly") {
+      return buchungstag.substring(5, 7) + "-" + buchungstag.substring(0, 4)
+    } else if (this.selectedtimeSector == "quarterly") {
+      let month = buchungstag.substring(5, 7);
+      let temp = "";
+      if (month == "01" || month == "02" || month == "03") {
+        temp = "Q1 ";
+      } else if (month == "04" || month == "05" || month == "06") {
+        temp = "Q2 ";
+      } else if (month == "07" || month == "08" || month == "09") {
+        temp = "Q3 ";
+      } else if (month == "10" || month == "11" || month == "12") {
+        temp = "Q4 ";
+      }
+      return temp + buchungstag.substring(0, 4)
+    } else if (this.selectedtimeSector == "half-yearly") {
+      let month = buchungstag.substring(5, 7);
+      let temp = "";
+      if (month == "01" || month == "02" || month == "03" || month == "04" || month == "05" || month == "06") {
+        temp = "01-06 ";
+      } else if (month == "07" || month == "08" || month == "09" || month == "10" || month == "11" || month == "12") {
+        temp = "07-12 ";
+      }
+      return temp + buchungstag.substring(0, 4)
+    } else if (this.selectedtimeSector == "yearly") {
+      return buchungstag.substring(0, 4)
+    } else {
+      return buchungstag.substring(5, 7) + "-" + buchungstag.substring(0, 4)
+    }
   }
 
   private sortUmseatzeArray() {
@@ -183,37 +180,8 @@ export class UmsaetzeComponent implements OnInit, AfterViewInit{
       Array.from(this.balanceArray.keys()).forEach(value => {
         totalSum = "0";
         this.umsaetze.forEach((element: Umsatz) => {
-          let timeSector = "";
-          const buchungstag = (moment(element.buchungstag)).format("yyyy-MM-DD");
-          if (this.selectedtimeSector == "monthly") {
-            timeSector = buchungstag.substring(5, 7) + "-" + buchungstag.toString().substring(0, 4)
-          } else if (this.selectedtimeSector == "quarterly"){
-            let month = buchungstag.substring(5, 7);
-            let temp = "";
-            if (month == "01" || month == "02" || month == "03" ){
-              temp = "Q1 ";
-            } else if (month == "04" || month == "05" || month == "06" ){
-              temp = "Q2 ";
-            } else if (month == "07" || month == "08" || month == "09" ){
-              temp = "Q3 ";
-            } else if (month == "10" || month == "11" || month == "12" ){
-              temp = "Q4 ";
-            }
-            timeSector = temp + buchungstag.toString().substring(0, 4);
-          } else if (this.selectedtimeSector == "half-yearly"){
-            let month = buchungstag.substring(5, 7);
-            let temp = "";
-            if (month == "01" || month == "02" || month == "03" || month == "04" || month == "05" || month == "06"){
-              temp = "01-06 ";
-            } else if (month == "07" || month == "08" || month == "09" || month == "10" || month == "11" || month == "12"){
-              temp = "07-12 ";
-            }
-            timeSector = temp + buchungstag.toString().substring(0, 4);
-          } else if (this.selectedtimeSector == "yearly"){
-            timeSector = buchungstag.substring(0, 4)
-          } else {
-            timeSector = buchungstag.substring(5, 7) + "-" + buchungstag.toString().substring(0, 4)
-          }
+          let timeSector = this.setDataIntoTimeCategories(element);
+
           if (kategoryName == element.kategory && timeSector == value && Number.parseFloat(element.umsatz.replaceAll(".", "")) < 0) {
             totalSum = (Number.parseFloat(totalSum) + Number.parseFloat(element.umsatz.replaceAll(".", ""))).toFixed(2);
           }
@@ -227,37 +195,8 @@ export class UmsaetzeComponent implements OnInit, AfterViewInit{
       let totalSum = "0";
       Array.from(this.balanceArray.keys()).forEach(value => {
         this.umsaetze.forEach((element: Umsatz) => {
-          let timeSector = "";
-          const buchungstag = (moment(element.buchungstag)).format("yyyy-MM-DD");
-          if (this.selectedtimeSector == "monthly") {
-            timeSector = buchungstag.substring(5, 7) + "-" + buchungstag.toString().substring(0, 4)
-          } else if (this.selectedtimeSector == "quarterly"){
-            let month = buchungstag.substring(5, 7);
-            let temp = "";
-            if (month == "01" || month == "02" || month == "03" ){
-              temp = "Q1 ";
-            } else if (month == "04" || month == "05" || month == "06" ){
-              temp = "Q2 ";
-            } else if (month == "07" || month == "08" || month == "09" ){
-              temp = "Q3 ";
-            } else if (month == "10" || month == "11" || month == "12" ){
-              temp = "Q4 ";
-            }
-            timeSector = temp + buchungstag.toString().substring(0, 4);
-          } else if (this.selectedtimeSector == "half-yearly"){
-            let month = buchungstag.substring(5, 7);
-            let temp = "";
-            if (month == "01" || month == "02" || month == "03" || month == "04" || month == "05" || month == "06"){
-              temp = "01-06 ";
-            } else if (month == "07" || month == "08" || month == "09" || month == "10" || month == "11" || month == "12"){
-              temp = "07-12 ";
-            }
-            timeSector = temp + buchungstag.toString().substring(0, 4);
-          } else if (this.selectedtimeSector == "yearly"){
-            timeSector = buchungstag.substring(0, 4)
-          } else {
-            timeSector = buchungstag.substring(5, 7) + "-" + buchungstag.toString().substring(0, 4)
-          }
+          let timeSector = this.setDataIntoTimeCategories(element);
+
           if (kategoryName == element.kategory && timeSector == value && Number.parseFloat(element.umsatz.replaceAll(".", "")) > 0) {
             totalSum = (Number.parseFloat(totalSum) + Number.parseFloat(element.umsatz.replaceAll(".", ""))).toFixed(2);
           }
@@ -444,7 +383,7 @@ export class UmsaetzeComponent implements OnInit, AfterViewInit{
   }
 
   onDateChange(){
-    if (this.range.value.start != null && this.range.value.end !=null){
+    if (this.dateRange.value.start != null && this.dateRange.value.end !=null){
       this.getUmsaetze();
     }
   }
